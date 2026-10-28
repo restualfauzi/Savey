@@ -18,6 +18,7 @@ import { LegalModal, LegalTab } from './components/LegalModal';
 import { PwaInstallGuideModal } from './components/PwaInstallGuideModal';
 import { SettingsModal } from './components/SettingsModal';
 import { LanguageModal } from './components/LanguageModal';
+import { VideoPreviewModal } from './components/VideoPreviewModal';
 import {
   VideoMetadata,
   DownloadHistoryItem,
@@ -51,6 +52,10 @@ function AppContent() {
   const [legalTab, setLegalTab] = useState<LegalTab>('privacy');
   const [isPwaOpen, setIsPwaOpen] = useState<boolean>(false);
   const [history, setHistory] = useState<DownloadHistoryItem[]>([]);
+  const [previewModalData, setPreviewModalData] = useState<{
+    video: VideoMetadata;
+    selectedOption?: QualityOption;
+  } | null>(null);
 
   const isDownloadingAllRef = useRef(false);
 
@@ -350,15 +355,41 @@ function AppContent() {
     isDownloadingAllRef.current = false;
   };
 
-  // Preview an item in the main player card
+  // Preview an item in the dedicated preview modal and player card
   const handlePreviewBatchItem = (item: BatchItem) => {
     if (item.metadata) {
       setParsedVideo(item.metadata);
-      setTimeout(() => {
-        const el = document.getElementById('video-result-section');
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }, 100);
+      setPreviewModalData({ video: item.metadata, selectedOption: item.selectedOption });
     }
+  };
+
+  const handlePreviewHistoryItem = (item: DownloadHistoryItem) => {
+    const formatType: 'mp4' | 'mp3' | 'jpg' =
+      item.format === 'mp3' ? 'mp3' : item.format === 'jpg' ? 'jpg' : 'mp4';
+    const meta: VideoMetadata = {
+      id: item.id,
+      platform: item.platform,
+      title: item.title,
+      author: {
+        name: item.authorName,
+        username: item.authorUsername,
+        avatar: undefined,
+      },
+      duration: 30,
+      cover: item.cover,
+      qualityOptions: [
+        {
+          id: 'hist',
+          label: item.resolution,
+          resolution: item.resolution,
+          format: formatType,
+          sizeEstimate: 'Original',
+          url: item.downloadUrl,
+          isRecommended: true,
+        },
+      ],
+    };
+    setPreviewModalData({ video: meta });
   };
 
   const handleScrollToDownloader = () => {
@@ -421,6 +452,7 @@ function AppContent() {
             video={parsedVideo}
             onSaveToHistory={handleSaveToHistory}
             onOpenGalleryGuide={() => setIsGalleryGuideOpen(true)}
+            onOpenPreview={(video, opt) => setPreviewModalData({ video, selectedOption: opt })}
           />
         )}
 
@@ -459,6 +491,7 @@ function AppContent() {
         onClearHistory={handleClearHistory}
         onDeleteItem={handleDeleteItem}
         onReDownload={handleReDownload}
+        onPreview={handlePreviewHistoryItem}
       />
 
       <LegalModal
@@ -475,6 +508,18 @@ function AppContent() {
       <LanguageModal
         isOpen={isLanguageModalOpen}
         onClose={() => setIsLanguageModalOpen(false)}
+      />
+
+      <VideoPreviewModal
+        isOpen={!!previewModalData}
+        onClose={() => setPreviewModalData(null)}
+        video={previewModalData?.video || null}
+        selectedOption={previewModalData?.selectedOption}
+        onDownload={(opt) => {
+          if (previewModalData?.video) {
+            handleSaveToHistory(previewModalData.video, opt);
+          }
+        }}
       />
     </div>
   );

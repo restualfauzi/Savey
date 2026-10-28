@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /api/download
+
+User-agent: Mediapartners-Google
+Allow: /
+
+User-agent: Googlebot
+Allow: /
+
+Sitemap: https://circlemesh.site/sitemap.xml

@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Trash2, Download, Film, Clock } from 'lucide-react';
+import { X, Trash2, Download, Film, Clock, Play } from 'lucide-react';
 import { DownloadHistoryItem } from '../types';
 import { PLATFORMS } from '../utils/platforms';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
@@ -11,6 +11,7 @@ interface HistoryDrawerProps {
   onClearHistory: () => void;
   onDeleteItem: (id: string) => void;
   onReDownload: (item: DownloadHistoryItem) => void;
+  onPreview?: (item: DownloadHistoryItem) => void;
 }
 
 export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
@@ -20,6 +21,7 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
   onClearHistory,
   onDeleteItem,
   onReDownload,
+  onPreview,
 }) => {
   const { t, language } = useThemeLanguage();
 
@@ -119,13 +121,24 @@ export const HistoryDrawer: React.FC<HistoryDrawerProps> = ({
                     </div>
 
                     <div className="flex items-center justify-between pt-2 mt-2 border-t border-slate-200 dark:border-white/[0.06]">
-                      <button
-                        onClick={() => onReDownload(item)}
-                        className="text-[11px] text-[#0071e3] dark:text-[#2997ff] hover:text-[#0077ed] font-semibold flex items-center gap-1 cursor-pointer"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>{t.history.reDownload}</span>
-                      </button>
+                      <div className="flex items-center gap-2">
+                        {onPreview && (
+                          <button
+                            onClick={() => onPreview(item)}
+                            className="text-[11px] text-slate-700 dark:text-slate-300 hover:text-[#0071e3] dark:hover:text-[#2997ff] font-semibold flex items-center gap-1 cursor-pointer bg-slate-100 dark:bg-white/10 px-2 py-0.5 rounded-md transition-colors"
+                          >
+                            <Play className="w-3 h-3 fill-current" />
+                            <span>{language === 'en' ? 'Preview' : 'Tonton'}</span>
+                          </button>
+                        )}
+                        <button
+                          onClick={() => onReDownload(item)}
+                          className="text-[11px] text-[#0071e3] dark:text-[#2997ff] hover:text-[#0077ed] font-semibold flex items-center gap-1 cursor-pointer"
+                        >
+                          <Download className="w-3.5 h-3.5" />
+                          <span>{t.history.reDownload}</span>
+                        </button>
+                      </div>
 
                       <button
                         onClick={() => onDeleteItem(item.id)}

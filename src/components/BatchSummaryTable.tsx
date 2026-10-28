@@ -11,7 +11,9 @@ import {
   Smartphone,
   ExternalLink,
   Film,
-  SlidersHorizontal
+  SlidersHorizontal,
+  Play,
+  Eye
 } from 'lucide-react';
 import { BatchItem, QualityOption, PreferredQuality } from '../types';
 import { PLATFORMS } from '../utils/platforms';
@@ -323,6 +325,17 @@ export const BatchSummaryTable: React.FC<BatchSummaryTableProps> = ({
                     {/* Actions */}
                     <td className="py-3.5 px-4 sm:px-6 text-right">
                       <div className="flex items-center justify-end gap-2">
+                        {item.metadata && (
+                          <button
+                            onClick={() => onPreviewItem(item)}
+                            className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/30 dark:hover:bg-blue-900/40 text-[#0071e3] dark:text-[#2997ff] text-[11px] font-semibold rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
+                            title={language === 'en' ? 'Preview video' : 'Preview / Cek video'}
+                          >
+                            <Play className="w-3 h-3 fill-current" />
+                            <span>{language === 'en' ? 'Preview' : 'Cek'}</span>
+                          </button>
+                        )}
+
                         {item.status === 'failed' ? (
                           <button
                             onClick={() => onRetryItem(item)}
@@ -496,6 +509,17 @@ export const BatchSummaryTable: React.FC<BatchSummaryTableProps> = ({
 
                   {/* Actions */}
                   <div className="flex items-center gap-2">
+                    {item.metadata && (
+                      <button
+                        onClick={() => onPreviewItem(item)}
+                        className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/30 dark:hover:bg-blue-900/40 text-[#0071e3] dark:text-[#2997ff] text-[11px] font-semibold rounded-xl flex items-center gap-1 cursor-pointer min-h-[36px]"
+                        title={language === 'en' ? 'Preview video' : 'Cek video'}
+                      >
+                        <Play className="w-3 h-3 fill-current" />
+                        <span>{language === 'en' ? 'Preview' : 'Cek'}</span>
+                      </button>
+                    )}
+
                     {item.status === 'ready' && (
                       <button
                         onClick={() => onDownloadItem(item)}

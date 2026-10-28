@@ -29,12 +29,14 @@ interface VideoResultCardProps {
   video: VideoMetadata;
   onSaveToHistory: (video: VideoMetadata, selectedOption: QualityOption) => void;
   onOpenGalleryGuide: () => void;
+  onOpenPreview?: (video: VideoMetadata, selectedOption?: QualityOption) => void;
 }
 
 export const VideoResultCard: React.FC<VideoResultCardProps> = ({
   video,
   onSaveToHistory,
   onOpenGalleryGuide,
+  onOpenPreview,
 }) => {
   const { t, language, matchPreferredQuality } = useThemeLanguage();
   const [selectedQualityId, setSelectedQualityId] = useState<string>(() => {
@@ -206,89 +208,92 @@ export const VideoResultCard: React.FC<VideoResultCardProps> = ({
         <div className="p-4 sm:p-10 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-center">
           {/* Left Column: iPhone Hardware Bezel Mockup */}
           <div className="lg:col-span-5 flex flex-col items-center">
-            {/* Mobile preview toggle */}
-            <button
-              type="button"
-              onClick={() => setShowMobilePreview(!showMobilePreview)}
-              className="lg:hidden mb-3 px-3 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-[#2c2c2e] dark:hover:bg-[#3a3a3c] text-slate-700 dark:text-slate-300 rounded-full text-[11px] font-medium transition-colors cursor-pointer flex items-center gap-1.5"
-            >
-              <Play className="w-3 h-3 text-[#0071e3] dark:text-[#2997ff]" />
-              <span>
-                {showMobilePreview
-                  ? language === 'en'
-                    ? 'Hide Video Frame'
-                    : 'Sembunyikan Bingkai Video'
-                  : language === 'en'
-                  ? 'Show Video Frame'
-                  : 'Tampilkan Bingkai Video'}
-              </span>
-            </button>
+            <div className="relative w-full max-w-[240px] sm:max-w-[280px] aspect-[9/19.5] bg-black rounded-[40px] sm:rounded-[44px] p-2.5 sm:p-3 shadow-2xl border-[3px] sm:border-[4px] border-slate-800 dark:border-[#3a3a3c] ring-1 ring-black/10 dark:ring-white/10 group transition-all">
+              {/* Dynamic Island Pill */}
+              <div className="absolute top-3.5 sm:top-4 left-1/2 -translate-x-1/2 w-16 sm:w-20 h-4.5 sm:h-5 bg-black rounded-full z-20 flex items-center justify-center pointer-events-none">
+                <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-[#161618] border border-white/10" />
+              </div>
 
-            {showMobilePreview && (
-              <div className="relative w-full max-w-[240px] sm:max-w-[280px] aspect-[9/19.5] bg-black rounded-[40px] sm:rounded-[44px] p-2.5 sm:p-3 shadow-2xl border-[3px] sm:border-[4px] border-slate-800 dark:border-[#3a3a3c] ring-1 ring-black/10 dark:ring-white/10 group transition-all">
-                {/* Dynamic Island Pill */}
-                <div className="absolute top-3.5 sm:top-4 left-1/2 -translate-x-1/2 w-16 sm:w-20 h-4.5 sm:h-5 bg-black rounded-full z-20 flex items-center justify-center pointer-events-none">
-                  <span className="w-2 sm:w-2.5 h-2 sm:h-2.5 rounded-full bg-[#161618] border border-white/10" />
-                </div>
+              {/* Video Screen Container */}
+              <div className="relative w-full h-full bg-black rounded-[32px] sm:rounded-[36px] overflow-hidden flex items-center justify-center">
+                <video
+                  ref={videoRef}
+                  src={currentOption?.url || video.qualityOptions.find((q) => q.format === 'mp4')?.url || ''}
+                  poster={video.cover}
+                  playsInline
+                  loop
+                  onPlay={() => setIsPlaying(true)}
+                  onPause={() => setIsPlaying(false)}
+                  className="w-full h-full object-cover cursor-pointer"
+                  onClick={handleTogglePlay}
+                />
 
-                {/* Video Screen Container */}
-                <div className="relative w-full h-full bg-black rounded-[32px] sm:rounded-[36px] overflow-hidden flex items-center justify-center">
-                  <video
-                    ref={videoRef}
-                    src={video.qualityOptions.find((q) => q.format === 'mp4')?.url || ''}
-                    poster={video.cover}
-                    playsInline
-                    loop
-                    onPlay={() => setIsPlaying(true)}
-                    onPause={() => setIsPlaying(false)}
-                    className="w-full h-full object-cover"
-                  />
+                {/* Big Centered Play Button when paused */}
+                {!isPlaying && (
+                  <button
+                    type="button"
+                    onClick={handleTogglePlay}
+                    className="absolute inset-0 m-auto w-14 h-14 rounded-full bg-black/60 hover:bg-black/80 backdrop-blur-md flex items-center justify-center text-white transition-all transform hover:scale-110 shadow-2xl z-20 cursor-pointer pointer-events-auto"
+                    aria-label="Play video"
+                  >
+                    <Play className="w-6 h-6 fill-white translate-x-0.5" />
+                  </button>
+                )}
 
-                  {/* Glass Reflection Scrim */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none flex flex-col justify-between p-3 sm:p-4 pt-7 sm:pt-8">
-                    {/* Top info */}
-                    <div className="flex items-center justify-between text-[11px] text-white">
-                      <span className="bg-black/50 backdrop-blur-md px-2 py-0.5 rounded-full font-mono">
-                        {currentOption?.resolution || '1080p'}
-                      </span>
-                      <span className="bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-medium">
-                        Master
-                      </span>
-                    </div>
+                {/* Glass Reflection Scrim */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/20 pointer-events-none flex flex-col justify-between p-3 sm:p-4 pt-7 sm:pt-8">
+                  {/* Top info */}
+                  <div className="flex items-center justify-between text-[11px] text-white">
+                    <span className="bg-black/50 backdrop-blur-md px-2 py-0.5 rounded-full font-mono">
+                      {currentOption?.resolution || '1080p'}
+                    </span>
+                    <span className="bg-white/20 backdrop-blur-md px-2 py-0.5 rounded-full text-[10px] font-medium">
+                      Master
+                    </span>
+                  </div>
 
-                    {/* Playback Controls */}
-                    <div className="pointer-events-auto flex items-center justify-between text-white">
+                  {/* Playback Controls */}
+                  <div className="pointer-events-auto flex items-center justify-between text-white">
+                    <button
+                      onClick={handleTogglePlay}
+                      className="p-2 sm:p-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+                      title={isPlaying ? 'Pause' : 'Play'}
+                    >
+                      {isPlaying ? <Pause className="w-3.5 h-3.5 fill-white" /> : <Play className="w-3.5 h-3.5 fill-white" />}
+                    </button>
+
+                    <div className="flex items-center gap-1.5 sm:gap-2">
                       <button
-                        onClick={handleTogglePlay}
-                        className="p-2 sm:p-2.5 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
-                        title={isPlaying ? 'Pause' : 'Play'}
+                        onClick={handleToggleMute}
+                        className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+                        title={isMuted ? 'Unmute' : 'Mute'}
                       >
-                        {isPlaying ? <Pause className="w-3.5 h-3.5 fill-white" /> : <Play className="w-3.5 h-3.5 fill-white" />}
+                        {isMuted ? <VolumeX className="w-3.5 h-3.5 text-[#2997ff]" /> : <Volume2 className="w-3.5 h-3.5" />}
                       </button>
-
-                      <div className="flex items-center gap-1.5 sm:gap-2">
-                        <button
-                          onClick={handleToggleMute}
-                          className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
-                          title={isMuted ? 'Unmute' : 'Mute'}
-                        >
-                          {isMuted ? <VolumeX className="w-3.5 h-3.5 text-[#2997ff]" /> : <Volume2 className="w-3.5 h-3.5" />}
-                        </button>
-                        <button
-                          onClick={handleTriggerFullscreen}
-                          className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
-                          title="Fullscreen"
-                        >
-                          <Maximize2 className="w-3.5 h-3.5" />
-                        </button>
-                      </div>
+                      <button
+                        onClick={handleTriggerFullscreen}
+                        className="p-2 bg-black/40 hover:bg-black/60 backdrop-blur-md rounded-full transition-colors cursor-pointer min-w-[36px] min-h-[36px] flex items-center justify-center"
+                        title="Fullscreen"
+                      >
+                        <Maximize2 className="w-3.5 h-3.5" />
+                      </button>
                     </div>
                   </div>
                 </div>
               </div>
-            )}
+            </div>
 
-            <p className="text-[11px] sm:text-[12px] text-slate-500 dark:text-[#86868b] mt-3">
+            {/* Quick Preview Button */}
+            <button
+              type="button"
+              onClick={() => onOpenPreview ? onOpenPreview(video, currentOption) : handleTogglePlay()}
+              className="mt-3 px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 dark:bg-[#2c2c2e] dark:hover:bg-[#3a3a3c] text-slate-700 dark:text-slate-300 rounded-full text-[12px] font-semibold transition-all cursor-pointer flex items-center gap-1.5 shadow-xs"
+            >
+              <Eye className="w-3.5 h-3.5 text-[#0071e3] dark:text-[#2997ff]" />
+              <span>{language === 'en' ? 'Live Preview Modal' : 'Buka Preview Penuh'}</span>
+            </button>
+
+            <p className="text-[11px] sm:text-[12px] text-slate-500 dark:text-[#86868b] mt-2">
               {t.result.previewHint}
             </p>
           </div>
@@ -473,28 +478,40 @@ export const VideoResultCard: React.FC<VideoResultCardProps> = ({
                 </div>
               )}
 
-              <button
-                type="button"
-                onClick={() => handleDownload()}
-                disabled={downloadProgress !== null}
-                className={`w-full py-3.5 px-6 font-semibold rounded-full text-[14px] sm:text-[15px] flex items-center justify-center gap-2.5 transition-all duration-300 cursor-pointer ${
-                  isSuccessPulsing
-                    ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 ring-4 ring-emerald-500/30 scale-[1.01] animate-pulse'
-                    : 'bg-[#0071e3] hover:bg-[#0077ed] active:scale-98 disabled:opacity-40 text-white shadow-lg shadow-[#0071e3]/20'
-                }`}
-              >
-                {isSuccessPulsing ? (
-                  <>
-                    <Check className="w-5 h-5 text-white stroke-[2.5]" />
-                    <span>{language === 'en' ? 'Downloaded & Saved to Gallery!' : 'Berhasil Disimpan ke Galeri!'}</span>
-                  </>
-                ) : (
-                  <>
-                    <Download className="w-4 h-4" />
-                    <span>{t.result.downloadBtn}</span>
-                  </>
-                )}
-              </button>
+              <div className="flex flex-col sm:flex-row items-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleDownload()}
+                  disabled={downloadProgress !== null}
+                  className={`flex-1 w-full py-3.5 px-6 font-semibold rounded-full text-[14px] sm:text-[15px] flex items-center justify-center gap-2.5 transition-all duration-300 cursor-pointer ${
+                    isSuccessPulsing
+                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 ring-4 ring-emerald-500/30 scale-[1.01] animate-pulse'
+                      : 'bg-[#0071e3] hover:bg-[#0077ed] active:scale-98 disabled:opacity-40 text-white shadow-lg shadow-[#0071e3]/20'
+                  }`}
+                >
+                  {isSuccessPulsing ? (
+                    <>
+                      <Check className="w-5 h-5 text-white stroke-[2.5]" />
+                      <span>{language === 'en' ? 'Downloaded & Saved to Gallery!' : 'Berhasil Disimpan ke Galeri!'}</span>
+                    </>
+                  ) : (
+                    <>
+                      <Download className="w-4 h-4" />
+                      <span>{t.result.downloadBtn}</span>
+                    </>
+                  )}
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => onOpenPreview ? onOpenPreview(video, currentOption) : handleTogglePlay()}
+                  className="w-full sm:w-auto py-3.5 px-5 font-semibold rounded-full text-[14px] sm:text-[15px] flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-[#2c2c2e] dark:hover:bg-[#3a3a3c] text-slate-900 dark:text-white border border-slate-200 dark:border-white/[0.08] transition-all cursor-pointer shadow-xs active:scale-98 shrink-0"
+                  title="Preview before download"
+                >
+                  <Play className="w-4 h-4 fill-current text-[#0071e3] dark:text-[#2997ff]" />
+                  <span>{language === 'en' ? 'Preview Video' : 'Preview / Cek Video'}</span>
+                </button>
+              </div>
 
               <div className="flex items-center justify-center gap-3 text-[11px] text-slate-500 dark:text-[#86868b] pt-1">
                 <span className="flex items-center gap-1 font-medium">
