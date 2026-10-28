@@ -1,4 +1,42 @@
-export type Language = 'en' | 'id';
+import { createAdditionalLocales } from './additionalLocales';
+
+export type Language =
+  | 'en'
+  | 'id'
+  | 'de'
+  | 'fr'
+  | 'es'
+  | 'ja'
+  | 'nl'
+  | 'it'
+  | 'sv'
+  | 'no'
+  | 'ko'
+  | 'ar';
+
+export interface LanguageMeta {
+  code: Language;
+  name: string;
+  nativeName: string;
+  flag: string;
+  cpmRegion: string;
+  dir?: 'ltr' | 'rtl';
+}
+
+export const SUPPORTED_LANGUAGES: LanguageMeta[] = [
+  { code: 'en', name: 'English', nativeName: 'English', flag: '🇺🇸', cpmRegion: 'US / UK / CA (Tier 1)' },
+  { code: 'de', name: 'German', nativeName: 'Deutsch', flag: '🇩🇪', cpmRegion: 'DE / AT / CH (Tier 1)' },
+  { code: 'fr', name: 'French', nativeName: 'Français', flag: '🇫🇷', cpmRegion: 'FR / CA / CH (Tier 1)' },
+  { code: 'es', name: 'Spanish', nativeName: 'Español', flag: '🇪🇸', cpmRegion: 'ES / US (Tier 1)' },
+  { code: 'ja', name: 'Japanese', nativeName: '日本語', flag: '🇯🇵', cpmRegion: 'JP (Tier 1 Asia)' },
+  { code: 'nl', name: 'Dutch', nativeName: 'Nederlands', flag: '🇳🇱', cpmRegion: 'NL / BE (Tier 1)' },
+  { code: 'it', name: 'Italian', nativeName: 'Italiano', flag: '🇮🇹', cpmRegion: 'IT (Tier 1)' },
+  { code: 'sv', name: 'Swedish', nativeName: 'Svenska', flag: '🇸🇪', cpmRegion: 'SE (Tier 1 Nordic)' },
+  { code: 'no', name: 'Norwegian', nativeName: 'Norsk', flag: '🇳🇴', cpmRegion: 'NO (Tier 1 Nordic)' },
+  { code: 'ko', name: 'Korean', nativeName: '한국어', flag: '🇰🇷', cpmRegion: 'KR (Tier 1 Asia)' },
+  { code: 'ar', name: 'Arabic', nativeName: 'العربية', flag: '🇦🇪', cpmRegion: 'AE / SA (Tier 1 Gulf)', dir: 'rtl' },
+  { code: 'id', name: 'Indonesian', nativeName: 'Bahasa Indonesia', flag: '🇮🇩', cpmRegion: 'ID (Fast Growth)' },
+];
 
 export interface Translations {
   nav: {
@@ -317,8 +355,7 @@ export interface Translations {
   };
 }
 
-export const DICTIONARY: Record<Language, Translations> = {
-  en: {
+const enLocale: Translations = {
     nav: {
       downloader: 'Downloader',
       platforms: 'Platforms',
@@ -837,8 +874,9 @@ export const DICTIONARY: Record<Language, Translations> = {
         }
       ]
     }
-  },
-  id: {
+  };
+
+const idLocale: Translations = {
     nav: {
       downloader: 'Pengunduh',
       platforms: 'Platform',
@@ -1357,5 +1395,11 @@ export const DICTIONARY: Record<Language, Translations> = {
         }
       ]
     }
-  }
+  };
+const extraLocales = createAdditionalLocales(enLocale);
+
+export const DICTIONARY: Record<Language, Translations> = {
+  en: enLocale,
+  id: idLocale,
+  ...extraLocales,
 };

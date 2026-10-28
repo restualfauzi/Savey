@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { PreferredQuality } from '../types';
+import { SUPPORTED_LANGUAGES } from '../utils/i18n';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -28,8 +29,11 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
     theme,
     toggleTheme,
     language,
-    setLanguage
+    setIsLanguageModalOpen,
   } = useThemeLanguage();
+
+  const currentLangMeta =
+    SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
 
   const [savedFeedback, setSavedFeedback] = useState<string | null>(null);
 
@@ -239,22 +243,28 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
             {/* Language Control */}
             <div className="p-3 bg-slate-50 dark:bg-[#121214] border border-slate-200 dark:border-white/[0.06] rounded-2xl flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Globe className="w-4 h-4 text-[#0071e3] dark:text-[#2997ff]" />
+              <div className="flex items-center gap-2.5">
+                <span className="text-[20px] leading-none" role="img" aria-label={currentLangMeta.name}>
+                  {currentLangMeta.flag}
+                </span>
                 <div>
                   <p className="text-[11px] text-slate-500 dark:text-[#86868b]">{t.settings.languageLabel}</p>
-                  <p className="text-[12px] font-semibold text-slate-900 dark:text-white uppercase font-mono">
-                    {language === 'en' ? 'English (EN)' : 'Indonesia (ID)'}
+                  <p className="text-[12px] font-semibold text-slate-900 dark:text-white">
+                    {currentLangMeta.nativeName} ({currentLangMeta.code.toUpperCase()})
                   </p>
                 </div>
               </div>
 
               <button
                 type="button"
-                onClick={() => setLanguage(language === 'en' ? 'id' : 'en')}
-                className="px-2.5 py-1 text-[11px] font-medium bg-white dark:bg-[#2c2c2e] border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-white rounded-lg shadow-sm hover:opacity-80 transition-opacity cursor-pointer font-mono"
+                onClick={() => {
+                  onClose();
+                  setIsLanguageModalOpen(true);
+                }}
+                className="px-3 py-1.5 text-[11px] font-medium bg-white dark:bg-[#2c2c2e] border border-slate-200 dark:border-white/[0.08] text-slate-800 dark:text-white rounded-lg shadow-sm hover:border-[#0071e3] transition-colors cursor-pointer flex items-center gap-1"
               >
-                {language === 'en' ? 'ID' : 'EN'}
+                <Globe className="w-3 h-3 text-[#0071e3] dark:text-[#2997ff]" />
+                <span>{language === 'en' ? 'Change' : 'Ubah'} (12)</span>
               </button>
             </div>
           </div>

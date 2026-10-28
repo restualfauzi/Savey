@@ -3,6 +3,7 @@ import { ArrowDownToLine, ShieldCheck, Globe, Mail } from 'lucide-react';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { LegalTab } from './LegalModal';
 import { PlatformIcon } from './SocialIcons';
+import { SUPPORTED_LANGUAGES } from '../utils/i18n';
 
 interface FooterProps {
   onOpenLegal: (tab: LegalTab) => void;
@@ -10,7 +11,8 @@ interface FooterProps {
 }
 
 export const Footer: React.FC<FooterProps> = ({ onOpenLegal, onOpenPwaGuide }) => {
-  const { t, language, setLanguage } = useThemeLanguage();
+  const { t, language, setIsLanguageModalOpen } = useThemeLanguage();
+  const currentLangMeta = SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
 
   return (
     <footer className="border-t border-slate-200 dark:border-white/[0.08] bg-slate-100 dark:bg-[#000000] text-slate-600 dark:text-[#86868b] text-[11px] pt-10 pb-24 sm:pb-12 transition-colors">
@@ -159,11 +161,13 @@ export const Footer: React.FC<FooterProps> = ({ onOpenLegal, onOpenPwaGuide }) =
             </button>
             <span>·</span>
             <button
-              onClick={() => setLanguage(language === 'en' ? 'id' : 'en')}
-              className="hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1 cursor-pointer font-medium"
+              onClick={() => setIsLanguageModalOpen(true)}
+              className="hover:text-slate-900 dark:hover:text-white transition-colors flex items-center gap-1.5 cursor-pointer font-medium"
+              title="Change region / language"
             >
               <Globe className="w-3 h-3 text-[#0071e3] dark:text-[#2997ff]" />
-              <span className="text-slate-900 dark:text-white">{t.footer.country}</span>
+              <span className="text-[13px] leading-none">{currentLangMeta.flag}</span>
+              <span className="text-slate-900 dark:text-white">{currentLangMeta.nativeName}</span>
             </button>
           </div>
         </div>

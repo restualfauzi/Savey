@@ -14,6 +14,7 @@ import {
   Layers
 } from 'lucide-react';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
+import { SUPPORTED_LANGUAGES } from '../utils/i18n';
 
 interface NavbarProps {
   onOpenHistory: () => void;
@@ -30,12 +31,15 @@ export const Navbar: React.FC<NavbarProps> = ({
     theme,
     toggleTheme,
     language,
-    setLanguage,
     t,
     preferredQuality,
     setPreferredQuality,
-    setIsSettingsOpen
+    setIsSettingsOpen,
+    setIsLanguageModalOpen,
   } = useThemeLanguage();
+
+  const currentLangMeta =
+    SUPPORTED_LANGUAGES.find((l) => l.code === language) || SUPPORTED_LANGUAGES[0];
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -109,14 +113,16 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Zone 3: Desktop Controls + Mobile Hamburger Trigger */}
           <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0">
-            {/* Language Switcher */}
+            {/* Language Switcher Modal Trigger */}
             <button
-              onClick={() => setLanguage(language === 'en' ? 'id' : 'en')}
-              className="px-2.5 py-1 text-[11px] font-medium text-slate-700 dark:text-[#86868b] hover:text-slate-900 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-[#161618] dark:hover:bg-[#2c2c2e] border border-slate-200 dark:border-white/[0.08] rounded-full transition-all flex items-center gap-1 cursor-pointer min-h-[32px]"
-              title={language === 'en' ? 'Ganti ke Bahasa Indonesia' : 'Switch to English'}
-              aria-label="Toggle language"
+              onClick={() => setIsLanguageModalOpen(true)}
+              className="px-2.5 py-1 text-[11px] font-medium text-slate-700 dark:text-[#86868b] hover:text-slate-900 dark:hover:text-white bg-slate-100 hover:bg-slate-200 dark:bg-[#161618] dark:hover:bg-[#2c2c2e] border border-slate-200 dark:border-white/[0.08] rounded-full transition-all flex items-center gap-1.5 cursor-pointer min-h-[32px]"
+              title={`${currentLangMeta.nativeName} (${currentLangMeta.name})`}
+              aria-label="Select language"
             >
-              <Globe className="w-3 h-3 text-[#0071e3] dark:text-[#2997ff]" />
+              <span className="text-[13px] leading-none" role="img" aria-label={currentLangMeta.name}>
+                {currentLangMeta.flag}
+              </span>
               <span className="uppercase font-mono font-semibold">{language}</span>
             </button>
 
@@ -189,46 +195,54 @@ export const Navbar: React.FC<NavbarProps> = ({
       {mobileMenuOpen && (
         <div className="fixed inset-x-0 top-12 bottom-0 z-40 bg-white/95 dark:bg-[#000000]/95 backdrop-blur-2xl md:hidden overflow-y-auto flex flex-col justify-between border-b border-slate-200 dark:border-white/[0.08] animate-fadeIn pb-safe">
           <div className="p-5 space-y-4">
-            {/* Quick Mobile History & Settings Card */}
-            <div className="grid grid-cols-2 gap-2.5 pb-3 border-b border-slate-100 dark:border-white/[0.06]">
+            {/* Quick Mobile History, Language & Settings Card */}
+            <div className="grid grid-cols-3 gap-2 pb-3 border-b border-slate-100 dark:border-white/[0.06]">
               <button
                 type="button"
                 onClick={() => handleMobileNavClick(onOpenHistory)}
-                className="p-3 bg-slate-50 dark:bg-[#161618] border border-slate-200 dark:border-white/[0.08] rounded-2xl flex items-center justify-between text-left cursor-pointer active:scale-98 transition-all"
+                className="p-2.5 bg-slate-50 dark:bg-[#161618] border border-slate-200 dark:border-white/[0.08] rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer active:scale-98 transition-all min-h-[64px]"
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-blue-50 dark:bg-[#2c2c2e] text-[#0071e3] dark:text-[#2997ff] flex items-center justify-center">
-                    <Clock className="w-3.5 h-3.5" />
-                  </div>
-                  <div>
-                    <span className="text-[12px] font-semibold text-slate-900 dark:text-white block leading-tight">
-                      {t.nav.history}
-                    </span>
-                    <span className="text-[10px] text-slate-500 dark:text-[#86868b]">
-                      {historyCount} {language === 'en' ? 'saved' : 'tersimpan'}
-                    </span>
-                  </div>
+                <div className="w-7 h-7 rounded-full bg-blue-50 dark:bg-[#2c2c2e] text-[#0071e3] dark:text-[#2997ff] flex items-center justify-center mb-1">
+                  <Clock className="w-3.5 h-3.5" />
                 </div>
+                <span className="text-[11px] font-semibold text-slate-900 dark:text-white truncate block max-w-full">
+                  {t.nav.history}
+                </span>
+                <span className="text-[9px] text-slate-500 dark:text-[#86868b]">
+                  {historyCount}
+                </span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => handleMobileNavClick(() => setIsLanguageModalOpen(true))}
+                className="p-2.5 bg-slate-50 dark:bg-[#161618] border border-slate-200 dark:border-white/[0.08] rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer active:scale-98 transition-all min-h-[64px]"
+              >
+                <div className="w-7 h-7 rounded-full bg-blue-50 dark:bg-[#2c2c2e] flex items-center justify-center mb-1 text-[14px]">
+                  {currentLangMeta.flag}
+                </div>
+                <span className="text-[11px] font-semibold text-slate-900 dark:text-white uppercase font-mono truncate block max-w-full">
+                  {language}
+                </span>
+                <span className="text-[9px] text-slate-500 dark:text-[#86868b] truncate max-w-full">
+                  {currentLangMeta.nativeName}
+                </span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleMobileNavClick(() => setIsSettingsOpen(true))}
-                className="p-3 bg-slate-50 dark:bg-[#161618] border border-slate-200 dark:border-white/[0.08] rounded-2xl flex items-center justify-between text-left cursor-pointer active:scale-98 transition-all"
+                className="p-2.5 bg-slate-50 dark:bg-[#161618] border border-slate-200 dark:border-white/[0.08] rounded-2xl flex flex-col items-center justify-center text-center cursor-pointer active:scale-98 transition-all min-h-[64px]"
               >
-                <div className="flex items-center gap-2">
-                  <div className="w-7 h-7 rounded-full bg-blue-50 dark:bg-[#2c2c2e] text-[#0071e3] dark:text-[#2997ff] flex items-center justify-center">
-                    <SlidersHorizontal className="w-3.5 h-3.5" />
-                  </div>
-                  <div>
-                    <span className="text-[12px] font-semibold text-slate-900 dark:text-white block leading-tight">
-                      {t.settings.title}
-                    </span>
-                    <span className="text-[10px] font-mono font-semibold text-[#0071e3] dark:text-[#2997ff] uppercase">
-                      {preferredQuality}
-                    </span>
-                  </div>
+                <div className="w-7 h-7 rounded-full bg-blue-50 dark:bg-[#2c2c2e] text-[#0071e3] dark:text-[#2997ff] flex items-center justify-center mb-1">
+                  <SlidersHorizontal className="w-3.5 h-3.5" />
                 </div>
+                <span className="text-[11px] font-semibold text-slate-900 dark:text-white truncate block max-w-full">
+                  {t.settings.navSettings}
+                </span>
+                <span className="text-[9px] font-mono font-semibold text-[#0071e3] dark:text-[#2997ff] uppercase">
+                  {preferredQuality}
+                </span>
               </button>
             </div>
 

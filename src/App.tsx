@@ -17,6 +17,7 @@ import { HistoryDrawer } from './components/HistoryDrawer';
 import { LegalModal, LegalTab } from './components/LegalModal';
 import { PwaInstallGuideModal } from './components/PwaInstallGuideModal';
 import { SettingsModal } from './components/SettingsModal';
+import { LanguageModal } from './components/LanguageModal';
 import {
   VideoMetadata,
   DownloadHistoryItem,
@@ -32,7 +33,13 @@ const HISTORY_STORAGE_KEY = 'savey_download_history_v1';
 const BATCH_STORAGE_KEY = 'savey_batch_queue_v1';
 
 function AppContent() {
-  const { matchPreferredQuality, isSettingsOpen, setIsSettingsOpen } = useThemeLanguage();
+  const {
+    matchPreferredQuality,
+    isSettingsOpen,
+    setIsSettingsOpen,
+    isLanguageModalOpen,
+    setIsLanguageModalOpen,
+  } = useThemeLanguage();
   const [parsedVideo, setParsedVideo] = useState<VideoMetadata | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [isProcessingBatch, setIsProcessingBatch] = useState<boolean>(false);
@@ -463,6 +470,11 @@ function AppContent() {
       <PwaInstallGuideModal
         isOpen={isPwaOpen}
         onClose={() => setIsPwaOpen(false)}
+      />
+
+      <LanguageModal
+        isOpen={isLanguageModalOpen}
+        onClose={() => setIsLanguageModalOpen(false)}
       />
     </div>
   );
