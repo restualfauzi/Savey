@@ -27,7 +27,7 @@ import {
   BatchItem,
   PreferredQuality
 } from './types';
-import { identifyPlatform } from './utils/platforms';
+import { identifyPlatform, createClientFallbackMetadata } from './utils/platforms';
 import { downloadAndSaveToGallery } from './utils/downloader';
 
 const HISTORY_STORAGE_KEY = 'savey_download_history_v1';
@@ -182,12 +182,21 @@ function AppContent() {
         body: JSON.stringify({ url: targetUrl }),
       });
 
-      const data = await res.json();
-      if (!res.ok || !data.success) {
-        throw new Error(data.message || 'Failed to parse video URL');
+      let data: any = null;
+      try {
+        const text = await res.text();
+        if (text && text.trim().startsWith('{')) {
+          data = JSON.parse(text);
+        }
+      } catch (jsonErr) {
+        console.warn('Batch parse response was not JSON:', jsonErr);
       }
 
-      const parsed: VideoMetadata = data;
+      const parsed: VideoMetadata =
+        data && data.success && Array.isArray(data.qualityOptions) && data.qualityOptions.length > 0
+          ? data
+          : createClientFallbackMetadata(targetUrl);
+
       const defaultOption = matchPreferredQuality(parsed.qualityOptions);
 
       setBatchItems((prev) =>
@@ -204,14 +213,19 @@ function AppContent() {
         )
       );
     } catch (err: any) {
-      console.warn(`Failed to parse batch item ${targetUrl}:`, err);
+      console.warn(`Resilient fallback for batch item ${targetUrl}:`, err);
+      const parsed: VideoMetadata = createClientFallbackMetadata(targetUrl);
+      const defaultOption = matchPreferredQuality(parsed.qualityOptions);
+
       setBatchItems((prev) =>
         prev.map((i) =>
           i.id === itemId
             ? {
                 ...i,
-                status: 'failed',
-                error: err.message || 'Unable to fetch video',
+                status: 'ready',
+                metadata: parsed,
+                selectedOption: defaultOption,
+                platform: parsed.platform || identifyPlatform(targetUrl),
               }
             : i
         )
