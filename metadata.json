@@ -1,0 +1,6 @@
+{
+  "name": "Savey - Pengunduh Video HD Tanpa Watermark",
+  "description": "Unduh video TikTok, Instagram, X/Twitter, Threads, dan Facebook tanpa tanda air dalam kualitas HD super jernih langsung tersimpan ke galeri perangkat Anda secara otomatis dan gratis.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
