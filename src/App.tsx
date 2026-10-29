@@ -19,6 +19,7 @@ import { PwaInstallGuideModal } from './components/PwaInstallGuideModal';
 import { SettingsModal } from './components/SettingsModal';
 import { LanguageModal } from './components/LanguageModal';
 import { VideoPreviewModal } from './components/VideoPreviewModal';
+import { BookmarkletModal } from './components/BookmarkletModal';
 import {
   VideoMetadata,
   DownloadHistoryItem,
@@ -51,6 +52,7 @@ function AppContent() {
   const [isLegalOpen, setIsLegalOpen] = useState<boolean>(false);
   const [legalTab, setLegalTab] = useState<LegalTab>('privacy');
   const [isPwaOpen, setIsPwaOpen] = useState<boolean>(false);
+  const [isBookmarkletOpen, setIsBookmarkletOpen] = useState<boolean>(false);
   const [history, setHistory] = useState<DownloadHistoryItem[]>([]);
   const [previewModalData, setPreviewModalData] = useState<{
     video: VideoMetadata;
@@ -429,6 +431,7 @@ function AppContent() {
         onOpenHistory={() => setIsHistoryOpen(true)}
         historyCount={history.length}
         onScrollToDownloader={handleScrollToDownloader}
+        onOpenBookmarklet={() => setIsBookmarkletOpen(true)}
       />
 
       {/* Main Content Area */}
@@ -522,6 +525,11 @@ function AppContent() {
       <LanguageModal
         isOpen={isLanguageModalOpen}
         onClose={() => setIsLanguageModalOpen(false)}
+      />
+
+      <BookmarkletModal
+        isOpen={isBookmarkletOpen}
+        onClose={() => setIsBookmarkletOpen(false)}
       />
 
       <VideoPreviewModal

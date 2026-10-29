@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Clipboard,
   X as CloseIcon,
@@ -17,6 +17,7 @@ import { PlatformType, VideoMetadata, PreferredQuality } from '../types';
 import { PLATFORMS, identifyPlatform, createClientFallbackMetadata } from '../utils/platforms';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { PlatformIcon } from './SocialIcons';
+import { AdBanner } from './AdBanner';
 
 interface HeroDownloaderProps {
   onVideoParsed: (video: VideoMetadata) => void;
@@ -48,6 +49,30 @@ export const HeroDownloader: React.FC<HeroDownloaderProps> = ({
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [clipboardStatus, setClipboardStatus] = useState<string | null>(null);
   const [qualityFeedback, setQualityFeedback] = useState<string | null>(null);
+
+  // Auto-fill and auto-submit if opened via bookmarklet (?url=...) or path routing
+  useEffect(() => {
+    try {
+      const params = new URLSearchParams(window.location.search);
+      const incomingUrl = params.get('url');
+      if (incomingUrl) {
+        setUrl(incomingUrl);
+        handleProcessSingle(incomingUrl);
+      }
+
+      // Check pathname for SEO platform landing routes e.g. /tiktok-downloader
+      const path = window.location.pathname.toLowerCase();
+      if (path.includes('tiktok')) setActiveTab('tiktok');
+      else if (path.includes('instagram')) setActiveTab('instagram');
+      else if (path.includes('twitter') || path.includes('/x')) setActiveTab('x');
+      else if (path.includes('threads')) setActiveTab('threads');
+      else if (path.includes('facebook')) setActiveTab('facebook');
+      else if (path.includes('pinterest')) setActiveTab('pinterest');
+      else if (path.includes('capcut')) setActiveTab('capcut');
+    } catch (e) {
+      console.warn(e);
+    }
+  }, []);
 
   const detectedPlatform = identifyPlatform(url);
   const currentPlatformInfo = PLATFORMS[detectedPlatform];
@@ -529,7 +554,22 @@ export const HeroDownloader: React.FC<HeroDownloaderProps> = ({
               >
                 Facebook
               </button>
+              <button
+                onClick={() => handleQuickSample('pinterest')}
+                className="px-3 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-[#161618] dark:hover:bg-[#2c2c2e] border border-slate-200 dark:border-white/[0.06] rounded-full text-slate-800 dark:text-white transition-colors cursor-pointer font-medium"
+              >
+                Pinterest
+              </button>
+              <button
+                onClick={() => handleQuickSample('capcut')}
+                className="px-3 py-1 bg-slate-100 hover:bg-slate-200 dark:bg-[#161618] dark:hover:bg-[#2c2c2e] border border-slate-200 dark:border-white/[0.06] rounded-full text-slate-800 dark:text-white transition-colors cursor-pointer font-medium"
+              >
+                CapCut
+              </button>
             </div>
+
+            {/* AdSense Placement 1: Below Downloader Form */}
+            <AdBanner format="horizontal" slot="1234567890" className="mt-6 mb-2" />
           </>
         )}
 

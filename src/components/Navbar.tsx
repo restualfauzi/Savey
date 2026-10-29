@@ -11,7 +11,8 @@ import {
   Smartphone,
   CheckCircle2,
   HelpCircle,
-  Layers
+  Layers,
+  Bookmark
 } from 'lucide-react';
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { SUPPORTED_LANGUAGES } from '../utils/i18n';
@@ -20,12 +21,14 @@ interface NavbarProps {
   onOpenHistory: () => void;
   historyCount: number;
   onScrollToDownloader: () => void;
+  onOpenBookmarklet?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   onOpenHistory,
   historyCount,
   onScrollToDownloader,
+  onOpenBookmarklet,
 }) => {
   const {
     theme,
@@ -149,6 +152,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               <SlidersHorizontal className="w-3 h-3 text-[#0071e3] dark:text-[#2997ff]" />
               <span className="font-mono font-semibold uppercase">{preferredQuality}</span>
             </button>
+
+            {/* Bookmarklet - Visible on md+ */}
+            {onOpenBookmarklet && (
+              <button
+                onClick={onOpenBookmarklet}
+                className="hidden lg:flex px-2.5 py-1 text-[11px] font-medium text-slate-600 dark:text-[#86868b] hover:text-[#0071e3] dark:hover:text-[#2997ff] transition-colors whitespace-nowrap shrink-0 items-center gap-1 cursor-pointer min-h-[32px]"
+                title="Browser Bookmarklet 1-Click"
+              >
+                <Bookmark className="w-3.5 h-3.5 text-[#0071e3] dark:text-[#2997ff]" />
+                <span>Bookmarklet</span>
+              </button>
+            )}
 
             {/* History - Visible on sm+ */}
             <button

@@ -1,4 +1,12 @@
-export type PlatformType = 'tiktok' | 'instagram' | 'x' | 'threads' | 'facebook' | 'unknown';
+export type PlatformType =
+  | 'tiktok'
+  | 'instagram'
+  | 'x'
+  | 'threads'
+  | 'facebook'
+  | 'pinterest'
+  | 'capcut'
+  | 'unknown';
 
 export type PreferredQuality = '1080p' | '720p' | 'mp3';
 
@@ -6,10 +14,18 @@ export interface QualityOption {
   id: string;
   label: string;
   resolution: string;
-  format: 'mp4' | 'mp3' | 'jpg';
+  format: 'mp4' | 'mp3' | 'jpg' | 'wav';
   sizeEstimate?: string;
   url: string;
   isRecommended?: boolean;
+}
+
+export interface CarouselSlide {
+  id: string;
+  type: 'image' | 'video';
+  url: string;
+  thumbnail: string;
+  index: number;
 }
 
 export interface VideoMetadata {
@@ -24,6 +40,7 @@ export interface VideoMetadata {
   duration?: number;
   cover: string;
   qualityOptions: QualityOption[];
+  slides?: CarouselSlide[];
   stats?: {
     likes?: string;
     comments?: string;
@@ -64,5 +81,3 @@ export interface BatchItem {
   selectedOption?: QualityOption;
   error?: string;
 }
-
-
