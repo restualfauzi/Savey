@@ -18,6 +18,7 @@ import { PLATFORMS, identifyPlatform, createClientFallbackMetadata } from '../ut
 import { useThemeLanguage } from '../context/ThemeLanguageContext';
 import { PlatformIcon } from './SocialIcons';
 import { AdBanner } from './AdBanner';
+import { getApiUrl } from '../utils/api';
 
 interface HeroDownloaderProps {
   onVideoParsed: (video: VideoMetadata) => void;
@@ -172,7 +173,7 @@ export const HeroDownloader: React.FC<HeroDownloaderProps> = ({
     setErrorMessage(null);
 
     try {
-      const res = await fetch('/api/parse', {
+      const res = await fetch(getApiUrl('/api/parse'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: targetUrl })

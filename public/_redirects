@@ -1,0 +1,9 @@
+# Cloudflare Pages Redirects & Rewrites
+
+# Option 1: Proxy API requests directly to your free backend (Render, Railway, or Koyeb)
+# Uncomment the line below and replace with your backend URL:
+# /api/*  https://your-savey-api.onrender.com/api/:splat  200
+
+# Option 2: Single Page Application (SPA) fallback routing
+# Ensures paths like /tiktok-downloader, /instagram-downloader, etc. render index.html
+/*  /index.html  200

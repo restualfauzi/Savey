@@ -30,6 +30,7 @@ import {
 } from './types';
 import { identifyPlatform, createClientFallbackMetadata } from './utils/platforms';
 import { downloadAndSaveToGallery } from './utils/downloader';
+import { getApiUrl } from './utils/api';
 
 const HISTORY_STORAGE_KEY = 'savey_download_history_v1';
 const BATCH_STORAGE_KEY = 'savey_batch_queue_v1';
@@ -178,7 +179,7 @@ function AppContent() {
     );
 
     try {
-      const res = await fetch('/api/parse', {
+      const res = await fetch(getApiUrl('/api/parse'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ url: targetUrl }),

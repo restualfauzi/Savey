@@ -2,6 +2,8 @@
  * Helper to download video files and trigger native device gallery save
  */
 
+import { getApiUrl } from './api';
+
 export interface DownloadProgressCallback {
   (percentage: number, loadedBytes: number, totalBytes: number): void;
 }
@@ -15,8 +17,8 @@ export async function downloadAndSaveToGallery(
   try {
     // If the download URL is already internal or needs proxying:
     const proxyUrl = downloadUrl.startsWith('http')
-      ? `/api/proxy-download?url=${encodeURIComponent(downloadUrl)}&filename=${encodeURIComponent(filename)}&type=${encodeURIComponent(mimeType)}`
-      : downloadUrl;
+      ? getApiUrl(`/api/proxy-download?url=${encodeURIComponent(downloadUrl)}&filename=${encodeURIComponent(filename)}&type=${encodeURIComponent(mimeType)}`)
+      : getApiUrl(downloadUrl);
 
     const response = await fetch(proxyUrl);
     if (!response.ok) {

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { X, AlertTriangle, Send, CheckCircle2, Loader2 } from 'lucide-react';
+import { getApiUrl } from '../utils/api';
 
 interface ReportBrokenModalProps {
   isOpen: boolean;
@@ -26,7 +27,7 @@ export const ReportBrokenModal: React.FC<ReportBrokenModalProps> = ({
     setIsSubmitting(true);
 
     try {
-      await fetch('/api/report-broken', {
+      await fetch(getApiUrl('/api/report-broken'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

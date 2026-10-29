@@ -10,6 +10,17 @@ const PORT = Number(process.env.PORT) || 3000;
 
 app.use(express.json());
 
+// Enable CORS for cross-domain hosting (e.g. Cloudflare Pages -> Backend PaaS)
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
 // Platform detection helper
 function detectPlatform(url: string): 'tiktok' | 'instagram' | 'x' | 'threads' | 'facebook' | 'pinterest' | 'capcut' | 'unknown' {
   const clean = url.trim().toLowerCase();
